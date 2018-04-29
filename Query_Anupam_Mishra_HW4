@@ -1,0 +1,54 @@
+Anupam Mishra - anupammi - 2053229568
+
+# Query 1
+coursegraph = TinkerGraph.open().traversal();
+
+coursegraph.addV("CS101").property(T.id,'CS101').as('CS101').
+addV("CS201").property(T.id,'CS201').as('CS201').
+addV("CS220").property(T.id,'CS220').as('CS220').
+addV("CS334").property(T.id,'CS334').as('CS334').
+addV("CS681").property(T.id,'CS681').as('CS681').
+addV("CS400").property(T.id,'CS400').as('CS400').
+addV("CS526").property(T.id,'CS526').as('CS526').
+addV("CS420").property(T.id,'CS420').as('CS420').
+addE('hasPrereq').from('CS526').to('CS400').
+addE('hasPrereq').from('CS400').to('CS334').
+addE('hasPrereq').from('CS681').to('CS334').
+addE('hasPrereq').from('CS201').to('CS101').
+addE('hasPrereq').from('CS220').to('CS201').
+addE('hasPrereq').from('CS334').to('CS201').
+addE('hasPrereq').from('CS420').to('CS220').
+addE('hasCoreq').from('CS526').to('CS400').
+addE('hasCoreq').from('CS420').to('CS220').iterate();
+
+## Explanation: 
+I have used two separate queries for this task. The first query is used to create a traverser (named: coursegraph) for the graph (which is created using TinkerGraph.open()). The traverser allows us to access the graph. 
+The second query is written using chaining, in this query we add the vertices (CS101, CS201, CS220, CS334, CS681, CS400, CS526, CS420) and the edges. There are two types of edge in the graph, Pre-req (Pre-requisite edges) and Co-req (Co-requisite edges). 
+In the end, to check the creation of the traversal we echo it on the console. 
+
+# Query 2
+coursegraph.V().as('a').out('hasPrereq').as('b').in('hasCoreq').where(eq('a')).select('a','b');
+
+## Explanation:
+In this query, we check it for all the vertex, All the vertices with the outgoing edge ‘Pre-req’ are taken and labelled as ‘a’. 
+The vertex on the other end is labelled as ‘b’. The in command returns the vertices which have an incoming edge “Co-req”. 
+The filter command(where) is used to choose the nodes for which the other end of the incoming edge to ‘b’ is same as ‘a’,
+ which is the vertex with the outgoing edge ‘Pre-req’ to ‘b’. select is then used to display ‘a’ and ‘b’.
+
+# Query 3
+coursegraph.V().has(T.id,"CS526").repeat(out("hasPrereq").dedup()).emit();
+
+##Explanation:
+We start traversing from the ‘CS526’ node. We then move along the outgoing ‘Pre-req’ edge to the next node. 
+We repeat this process until we reach a node that has no outgoing edge from it. dedup() function is used to remove duplicate nodes.
+ emit() function is used to display the current node in the traverser. emit() gives the final node which does not have any outgoing edge. 
+
+# Query 4
+coursegraph.V().has(T.id,'CS101').emit().repeat(__.in()).path().count(local).max();
+
+## Explanation:
+We start traversing from CS101. emit() function is used to echo the current node in the traverser. 
+The repeat() method moves the traverser along the incoming edges to the next node at the other end of the edge. 
+This process is done repeatedly until we reach the node with no incoming edges. This takes in both the ‘Pre-req’ edge and ‘Co-req edge’. 
+The path() method returns the sequence of the nodes that are visited by the traverser before reaching the current node. 
+The count(local) method returns the size of each path encountered. The max() method returns the length of the longest path found. 
